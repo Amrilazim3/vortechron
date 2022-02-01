@@ -3,7 +3,7 @@
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use Illuminate\Support\Facades\Auth;
@@ -24,15 +24,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('guest')->group(function() {
-    Route::post('/signup', [SignUpController::class, 'signUp']);
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/sign-up', [SignUpController::class, 'signUp']);
+    Route::post('/sign-in', [SignInController::class, 'signIn']);
 
     Route::get('oauth/{service}', [OAuthController::class, 'redirect']);
     Route::get('oauth/{service}/callback', [OAuthController::class, 'handleCallback']);
-    Route::get('oauth/login/{user}', [OAuthController::class, 'OAuthLogin']);
+    Route::get('oauth/sign-in/{user}', [OAuthController::class, 'OAuthSignIn']);
 });
 
 
 Route::middleware('auth')->group(function() {
-    Route::post('/logout', [LoginController::class, 'destroy']);
+    Route::post('/sign-out', [SignInController::class, 'destroy']);
 });
