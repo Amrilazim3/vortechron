@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
+use App\Http\Controllers\User\ProfileController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -35,4 +36,6 @@ Route::middleware('guest')->group(function() {
 
 Route::middleware('auth')->group(function() {
     Route::post('/sign-out', [SignInController::class, 'destroy']);
+
+    Route::post('/user/profile/edit', [ProfileController::class, 'edit']);
 });
