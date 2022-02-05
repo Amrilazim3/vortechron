@@ -41,7 +41,8 @@
   }
 
   .title {
-    font-size: 36px;
+    font-size: 40px;
+    font-weight: 600;
     padding: 20px;
   }
 </style>
