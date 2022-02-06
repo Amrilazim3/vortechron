@@ -12,7 +12,6 @@ class ProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        //validate data 
         $validated = $request->validate([
             'name' => 'required|min:6',
             'username' => 'required|min:6',
@@ -21,17 +20,25 @@ class ProfileController extends Controller
                 'required',
                 'email',
                 Rule::unique('users')->ignore(Auth::user()->id),
-            ]
+            ],
+            'file' => 'nullable|image|file'
         ]);
 
-        //update database 
-        if ($validated) {
-            Auth::user()->update([
-                    'name' => $request->name,
-                    'username' => $request->username,
-                    'bio' => $request->bio,
-                    'email' => $request->email
-                ]);
-        } 
+        //update database
+        $user = Auth::user();
+        
+        $user->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'bio' => $request->bio,
+            'email' => $request->email,
+            'image_url' => $request->hasFile('file') ? 
+                $request->file('file')->store('images', 'public') :
+                $user->image_url
+        ]);
+
+        return response()->json([
+            'user' => $user
+        ]);
     }
 }
