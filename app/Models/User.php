@@ -46,4 +46,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public $appends = [
+        'image_full_url'
+    ];
+
+    public function getImageFullUrlAttribute()
+    {
+        return asset('storage/'.$this->image_url);
+    }
 }
