@@ -38,4 +38,5 @@ Route::middleware('auth')->group(function() {
     Route::post('/sign-out', [SignInController::class, 'destroy']);
 
     Route::post('/user/profile/edit', [ProfileController::class, 'edit']);
+    Route::get('/user/profile/remove-file', [ProfileController::class, 'removeFile']);
 });
