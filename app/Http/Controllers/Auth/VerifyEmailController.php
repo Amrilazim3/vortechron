@@ -24,4 +24,12 @@ class VerifyEmailController extends Controller
 
         return redirect(config('app.spa_url') . '/dashboard?message=verification_success');
     }
+
+    public function resend(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+        return response()->json([
+            'message' => 'verification resend'
+        ]);
+    }
 }
