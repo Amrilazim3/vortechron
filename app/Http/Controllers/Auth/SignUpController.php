@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class SignUpController extends Controller
@@ -11,8 +12,8 @@ class SignUpController extends Controller
     public function signUp(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:6',
-            'username' => 'required|min:6',
+            'name' => 'required|max:50',
+            'username' => 'required|min:4|max:15',
             'email' => 'required|unique:users,email|email',
             'password' => 'required|confirmed|min:9'
         ]);
@@ -24,8 +25,8 @@ class SignUpController extends Controller
             'password' => bcrypt($request->password)  
         ]);
 
-        if ($user) {
-            return response(['success' => 'user is created']);
-        }
+        event(new Registered($user));
+
+        return response(['success' => 'user is created']);
     }
 }
