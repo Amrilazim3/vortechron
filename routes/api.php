@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\User\ProfileController;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,3 +40,13 @@ Route::middleware('auth')->group(function() {
     Route::post('/user/profile/edit', [ProfileController::class, 'edit']);
     Route::get('/user/profile/remove-file', [ProfileController::class, 'removeFile']);
 });
+
+// Verify email
+Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+// Resend link to verify email
+Route::post('/email/verify/resend', [VerifyEmailController::class, 'resend'])
+    ->middleware(['auth:sanctum', 'throttle:6,1'])
+    ->name('verification.send');
