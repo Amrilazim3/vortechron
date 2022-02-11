@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Exceptions\EmailTakenException;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -55,6 +56,8 @@ class OAuthController extends Controller
             'service_id' => $sUser->getId(),
             'password' => bcrypt('XXXXXXXXXX')
         ]);
+
+        event(new Registered($user));
 
         return $user;
     }
