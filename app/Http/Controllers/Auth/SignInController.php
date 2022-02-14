@@ -11,7 +11,7 @@ class SignInController extends Controller
     public function signIn(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required'],
         ]);
 
@@ -20,7 +20,9 @@ class SignInController extends Controller
 
             return true;
         } else {
-            return false;
+            return response()->json([
+                'error' => 'something went wrong.'
+            ], 422);
         }
     }
 
