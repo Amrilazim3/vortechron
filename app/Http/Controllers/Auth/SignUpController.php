@@ -12,7 +12,7 @@ class SignUpController extends Controller
     public function signUp(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:50',
+            'name' => 'required|min:4|max:30',
             'username' => 'required|min:4|max:15',
             'email' => 'required|unique:users,email|email',
             'password' => 'required|confirmed|min:9'
