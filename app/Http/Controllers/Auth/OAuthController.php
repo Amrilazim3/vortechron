@@ -54,7 +54,7 @@ class OAuthController extends Controller
             'email' => $sUser->getEmail(),
             'service' => $service,
             'service_id' => $sUser->getId(),
-            'password' => bcrypt('XXXXXXXXXX')
+            'password' => null
         ]);
 
         event(new Registered($user));
