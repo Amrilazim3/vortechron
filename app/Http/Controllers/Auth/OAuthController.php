@@ -57,8 +57,6 @@ class OAuthController extends Controller
             'password' => null
         ]);
 
-        event(new Registered($user));
-
         return $user;
     }
 
