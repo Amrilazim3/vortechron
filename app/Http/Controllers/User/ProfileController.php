@@ -16,16 +16,17 @@ class ProfileController extends Controller
     public function edit(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:6',
-            'username' => 'required|min:6',
-            'bio' => 'max:50',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users')->ignore(Auth::user()->id),
-            ],
+            'name' => 'required|min:4|max:50',
+            'username' => 'required|min:4|max:15',
+            'bio' => 'nullable|max:100',
             'file' => 'nullable|image|file'
         ]);
+
+        // 'email' => [
+        //     'required',
+        //     'email',
+        //     Rule::unique('users')->ignore(Auth::user()->id),
+        // ],
 
         $user = Auth::user();
         
@@ -34,7 +35,6 @@ class ProfileController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'bio' => $request->bio,
-            'email' => $request->email,
             'image_url' => $request->hasFile('file') ? 
                 $this->updateFile($request, $user) :
                 $user->image_url
