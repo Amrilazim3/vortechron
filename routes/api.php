@@ -37,8 +37,8 @@ Route::middleware('guest')->group(function() {
 Route::middleware('auth')->group(function() {
     Route::post('/sign-out', [SignInController::class, 'destroy']);
 
-    Route::post('/user/profile/edit', [ProfileController::class, 'edit']);
-    Route::get('/user/profile/remove-file', [ProfileController::class, 'removeFile']);
+    Route::post('/user/account/profile/edit', [ProfileController::class, 'edit']);
+    Route::get('/user/account/profile/remove-profile-image', [ProfileController::class, 'removeFile']);
 });
 
 // Verify email
