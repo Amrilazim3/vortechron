@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Exception;
-use Illuminate\Validation\Rule;
+use App\Rules\ValidatePassword;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -22,20 +20,14 @@ class ProfileController extends Controller
             'file' => 'nullable|image|file'
         ]);
 
-        // 'email' => [
-        //     'required',
-        //     'email',
-        //     Rule::unique('users')->ignore(Auth::user()->id),
-        // ],
-
         $user = Auth::user();
-        
+
         //update database
         $user->update([
             'name' => $request->name,
             'username' => $request->username,
             'bio' => $request->bio,
-            'image_url' => $request->hasFile('file') ? 
+            'image_url' => $request->hasFile('file') ?
                 $this->updateFile($request, $user) :
                 $user->image_url
         ]);
@@ -65,5 +57,28 @@ class ProfileController extends Controller
         Storage::disk('public')->delete($user->image_url);
 
         return $request->file('file')->store('images', 'public');
+    }
+
+    public function changeEmail(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email'
+            ],
+            'password' => ['required', new ValidatePassword($user)]
+        ]);
+
+        $user->update([
+            'email_verified_at' => null,
+            'email' => $request->email
+        ]);
+
+        event(new Registered($user));
+
+        return true;
     }
 }
