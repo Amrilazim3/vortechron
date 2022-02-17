@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function() {
 
     Route::post('/user/account/profile/edit', [ProfileController::class, 'edit']);
     Route::get('/user/account/profile/remove-profile-image', [ProfileController::class, 'removeFile']);
+    Route::post('/user/account/profile/change-email', [ProfileController::class, 'changeEmail']);
 });
 
 // Verify email
