@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\Account\EditProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
@@ -37,9 +37,9 @@ Route::middleware('guest')->group(function() {
 Route::middleware('auth')->group(function() {
     Route::post('/sign-out', [SignInController::class, 'destroy']);
 
-    Route::post('/user/account/profile/edit', [ProfileController::class, 'edit']);
-    Route::get('/user/account/profile/remove-profile-image', [ProfileController::class, 'removeFile']);
-    Route::post('/user/account/profile/change-email', [ProfileController::class, 'changeEmail']);
+    Route::post('/user/account/profile/edit', [EditProfileController::class, 'edit']);
+    Route::get('/user/account/profile/remove-profile-image', [EditProfileController::class, 'removeFile']);
+    Route::post('/user/account/profile/change-email', [EditProfileController::class, 'changeEmail']);
 });
 
 // Verify email
