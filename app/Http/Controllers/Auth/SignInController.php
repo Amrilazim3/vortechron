@@ -35,9 +35,11 @@ class SignInController extends Controller
 
     protected function oauthSignIn($request)
     {
-        $oauthservice = User::where('email', $request->email)
-        ->where('password', null)
-        ->first();
+        if ($request->password !== null) {
+            return false;
+        }
+        
+        $oauthservice = User::where('email', $request->email)->first();
 
         if ($oauthservice) {
             Auth::login($oauthservice);
