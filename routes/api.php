@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\User\Account\EditProfileController;
+use App\Http\Controllers\User\ChangePasswordController;
+use App\Http\Controllers\User\SetPasswordController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -28,6 +30,11 @@ Route::middleware('auth')->group(function() {
     Route::post('/user/account/profile/edit', [EditProfileController::class, 'edit']);
     Route::get('/user/account/profile/remove-profile-image', [EditProfileController::class, 'removeFile']);
     Route::post('/user/account/profile/change-email', [EditProfileController::class, 'changeEmail']);
+    
+    Route::post('/user/account/change-password', [ChangePasswordController::class, 'update']);
+
+    Route::get('/user/account/change-password/get-password', [ChangePasswordController::class, 'getPassword']);
+    Route::post('/user/account/set-password', [SetPasswordController::class, 'setPassword']);
 });
 
 // Verify email
