@@ -37,6 +37,6 @@ class ValidatePassword implements Rule
      */
     public function message()
     {
-        return 'Password not match.';
+        return 'Password given is incorrect.';
     }
 }
