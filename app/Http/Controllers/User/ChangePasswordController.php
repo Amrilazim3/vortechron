@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Rules\ValidateNewPassword;
 use App\Rules\ValidatePassword;
+use App\Rules\VerifyPassword;
 use Illuminate\Support\Facades\Auth;
 
 class ChangePasswordController extends Controller
@@ -22,6 +23,7 @@ class ChangePasswordController extends Controller
             'new_password' => [
                 'required',
                 'min:9',
+                new VerifyPassword,
                 new ValidateNewPassword($user)
             ],
             'new_password_confirmation' => [
