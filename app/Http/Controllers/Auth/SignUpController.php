@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class SignUpController extends Controller
 {
-    public function signUp(Request $request)
+    public function __invoke(Request $request)
     {
         $request->validate([
             'name' => 'required|min:4|max:50',

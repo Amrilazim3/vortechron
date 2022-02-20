@@ -17,8 +17,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('guest')->group(function() {
-    Route::post('/sign-up', [SignUpController::class, 'signUp']);
-    Route::post('/sign-in', [SignInController::class, 'signIn']);
+    Route::post('/sign-up', [SignUpController::class, '__invoke']);
+    Route::post('/sign-in', [SignInController::class, 'index']);
 
     Route::get('oauth/{service}', [OAuthController::class, 'redirect']);
     Route::get('oauth/{service}/callback', [OAuthController::class, 'handleCallback']);

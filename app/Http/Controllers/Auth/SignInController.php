@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SignInController extends Controller
 {
-    public function signIn(Request $request)
+    public function index(Request $request)
     {
         $oauthSignIn = $this->oauthSignIn($request);
 
