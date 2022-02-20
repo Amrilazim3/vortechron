@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\User\Account\EditProfileController;
 use App\Http\Controllers\User\ChangePasswordController;
+use App\Http\Controllers\User\ForgotPasswordController;
+use App\Http\Controllers\User\ResetPasswordController;
 use App\Http\Controllers\User\SetPasswordController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -33,9 +35,21 @@ Route::middleware('auth')->group(function() {
     
     Route::post('/user/account/change-password', [ChangePasswordController::class, 'update']);
 
-    Route::get('/user/account/change-password/get-password', [ChangePasswordController::class, 'getPassword']);
+    Route::get('/user/account/get-password', [ChangePasswordController::class, 'getPassword']);
     Route::post('/user/account/set-password', [SetPasswordController::class, 'setPassword']);
 });
+
+// This route can be access by non-authenticated & authenticated users (as long user have password)
+Route::post('/user/account/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
+    ->name('password.email');
+
+// when user click link in the email
+Route::get('/user/account/forgot-password/{token}', [ForgotPasswordController::class, 'handle'])
+    ->name('password.reset');
+
+//handle reset password form 
+Route::post('/user/account/reset-password', [ResetPasswordController::class, 'resetPassword']);
+
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
