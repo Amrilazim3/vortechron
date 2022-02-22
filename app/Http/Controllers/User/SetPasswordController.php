@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SetPasswordController extends Controller
 {
-    public function setPassword(Request $request)
+    public function __invoke(Request $request)
     {
         $user = Auth::user();
 
