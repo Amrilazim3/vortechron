@@ -17,13 +17,31 @@ class FriendController extends Controller
 
         $friends = $user->friends();
         $followers = $user->followersIds();
-        $followings = $user->followingsIds();
+        $following = $user->followingIds();
         $friendRequestSentTo = $user->pendingFriendRequestsSentIds();
         return response()->json([
             'friends'  => $friends,
             'followers' => $followers,
-            'followings' => $followings,
+            'following' => $following,
             'friend_request_sent_to' => $friendRequestSentTo
+        ]);
+    }
+
+    public function show(User $user, Request $request)
+    {
+        $authUser = $request->user();
+
+        $followers = $user->followersIds();
+        $following = $user->followingIds();
+        $isFriendWith = $authUser->isFriendsWith($user->id);
+        $isSentFriendRequestTo = $authUser->hasPendingFriendRequestSentTo($user->id);
+
+        return response()->json([
+            'user' => $user,
+            'followers' => $followers,
+            'following' => $following,
+            'is_friend_with' => $isFriendWith,
+            'is_sent_friend_request_to' => $isSentFriendRequestTo
         ]);
     }
 
@@ -40,6 +58,11 @@ class FriendController extends Controller
     public function delete(User $user, Request $request)
     {
         return $request->user()->deleteFriend($user->id);
+    }
+
+    public function unfollow(User $user, Request $request)
+    {
+        return $request->user()->unfollow($user->id);
     }
 
     public function paginate($items, $perPage = 5, $page = null, $options = [])
