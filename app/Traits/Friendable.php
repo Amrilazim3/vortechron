@@ -51,22 +51,22 @@ trait Friendable {
         return collect($this->followers())->pluck('id')->toArray();
     }
 
-    public function followings()
+    public function following()
     {
         $followingArr = array();
-        $followings = Friend::where('requester', $this->id)
+        $followingUsers = Friend::where('requester', $this->id)
             ->where('status', 1)
             ->get();
-        foreach ($followings as $following) {
+        foreach ($followingUsers as $following) {
             array_push($followingArr, User::find($following->user_requested));
         }
 
         return $followingArr;
     }
 
-    public function followingsIds()
+    public function followingIds()
     {
-        return collect($this->followings())->pluck('id')->toArray();
+        return collect($this->following())->pluck('id')->toArray();
     }
 
     // other users is pending request for current user.
@@ -145,7 +145,7 @@ trait Friendable {
     // check if current user is friend with other user.
     public function isFriendsWith($id)
     {
-        if (in_array($id, $this->followingsIds())) {
+        if (in_array($id, $this->followingIds())) {
             return 1;
         } else {
             return 0;
@@ -158,6 +158,7 @@ trait Friendable {
         if($this->id === $user_requested_id) {
 			return 0;
         }
+
         if($this->isFriendsWith($user_requested_id) === 1) {
 			return "already friends";
         }
@@ -172,6 +173,7 @@ trait Friendable {
         if($this->hasPendingFriendRequestFrom($user_requested_id) === 1){
 			return $this->acceptFriend($user_requested_id);
 		}
+
         $friendship = Friend::create([
             'requester' => $this->id,
             'user_requested' => $user_requested_id,
@@ -222,7 +224,7 @@ trait Friendable {
 		if($this->id === $user_requested_id) {
             return 0;
         }
-		if(in_array($user_requested_id, $this->followersIds()) || in_array($user_requested_id, $this->followingsIds())) {
+		if(in_array($user_requested_id, $this->followersIds()) || in_array($user_requested_id, $this->followingIds())) {
             $Friendship1 = Friend::where('requester', $user_requested_id)
             ->where('user_requested', $this->id)
             ->first();
@@ -236,5 +238,18 @@ trait Friendable {
                 $Friendship2->delete();
             }
         }
+    }
+
+    public function unfollow($user_requested_id)
+    {
+        $following = Friend::where('user_requested', $user_requested_id)
+            ->where('status', 1);
+        
+            if ($following) {
+                $following->delete();
+                return 1;
+            } else{
+                return 0;
+            }
     }
 }
