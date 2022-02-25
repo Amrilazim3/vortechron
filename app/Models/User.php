@@ -54,6 +54,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'image_full_url'
     ];
 
+    public function scopeSearch($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('username', 'like', '%' . $search . '%')
+                ->orWhere('name', 'like', '%' . $search . '%');
+            });
+        });
+    }
+
     public function getImageFullUrlAttribute()
     {
         return asset('storage/'.$this->image_url);
