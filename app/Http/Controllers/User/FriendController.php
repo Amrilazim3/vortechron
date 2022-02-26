@@ -34,6 +34,8 @@ class FriendController extends Controller
         $followers = $user->followersIds();
         $following = $user->followingIds();
         $isFriendWith = $authUser->isFriendsWith($user->id);
+        $userIsFriendWithAuthUser = $user->isFriendsWith($authUser->id);
+        $isSentFriendRequestFrom = $authUser->hasPendingFriendRequestFrom($user->id);
         $isSentFriendRequestTo = $authUser->hasPendingFriendRequestSentTo($user->id);
 
         return response()->json([
@@ -41,7 +43,21 @@ class FriendController extends Controller
             'followers' => $followers,
             'following' => $following,
             'is_friend_with' => $isFriendWith,
-            'is_sent_friend_request_to' => $isSentFriendRequestTo
+            'user_friend_with_auth_user' => $userIsFriendWithAuthUser,
+            'is_sent_friend_request_to' => $isSentFriendRequestTo,
+            'is_sent_friend_request_from' => $isSentFriendRequestFrom
+        ]);
+    }
+
+    public function viewOnly(User $user)
+    {
+        $followers = $user->followersIds();
+        $following = $user->followingIds();
+
+        return response()->json([
+            'user' => $user,
+            'followers' => $followers,
+            'following' => $following,
         ]);
     }
 
@@ -63,6 +79,18 @@ class FriendController extends Controller
     public function unfollow(User $user, Request $request)
     {
         return $request->user()->unfollow($user->id);
+    }
+
+    public function accept(User $user, Request $request) 
+    {
+        $authUser = $request->user();
+        return $authUser->acceptFriend($user->id);
+    }
+
+    public function deny(User $user, Request $request)
+    {
+        $authUser = $request->user();
+        return $authUser->denyFriend($user->id);
     }
 
     public function paginate($items, $perPage = 5, $page = null, $options = [])
