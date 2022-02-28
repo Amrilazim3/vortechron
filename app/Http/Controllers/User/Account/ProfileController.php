@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\User\Account;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\SlowJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
