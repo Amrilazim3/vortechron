@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendEmailVerificationJob;
 use App\Models\User;
 use App\Rules\VerifyPassword;
 use Illuminate\Auth\Events\Registered;
@@ -31,7 +32,7 @@ class SignUpController extends Controller
             'password' => bcrypt($request->password)  
         ]);
 
-        event(new Registered($user));
+        SendEmailVerificationJob::dispatch($user);
 
         return response(['success' => 'user is created']);
     }
