@@ -16,14 +16,8 @@ class FriendController extends Controller
         $user = $request->user();
 
         $friends = $user->friends();
-        $followers = $user->followersIds();
-        $following = $user->followingIds();
-        $friendRequestSentTo = $user->pendingFriendRequestsSentIds();
         return response()->json([
             'friends'  => $friends,
-            'followers' => $followers,
-            'following' => $following,
-            'friend_request_sent_to' => $friendRequestSentTo
         ]);
     }
 
@@ -35,17 +29,13 @@ class FriendController extends Controller
         $following = $user->followingIds();
         $isFriendWith = $authUser->isFriendsWith($user->id);
         $userIsFriendWithAuthUser = $user->isFriendsWith($authUser->id);
-        $isSentFriendRequestFrom = $authUser->hasPendingFriendRequestFrom($user->id);
-        $isSentFriendRequestTo = $authUser->hasPendingFriendRequestSentTo($user->id);
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
             'followers' => $followers,
             'following' => $following,
             'is_friend_with' => $isFriendWith,
             'user_friend_with_auth_user' => $userIsFriendWithAuthUser,
-            'is_sent_friend_request_to' => $isSentFriendRequestTo,
-            'is_sent_friend_request_from' => $isSentFriendRequestFrom
         ]);
     }
 
@@ -55,7 +45,7 @@ class FriendController extends Controller
         $following = $user->followingIds();
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
             'followers' => $followers,
             'following' => $following,
         ]);
@@ -63,34 +53,12 @@ class FriendController extends Controller
 
     public function follow(User $user, Request $request)
     {
-        return $request->user()->addFriend($user->id);
-    }
-
-    public function cancelRequest(User $user, Request $request)
-    {
-        return $request->user()->cancelFriendRequestSentTo($user->id);
-    }
-
-    public function delete(User $user, Request $request)
-    {
-        return $request->user()->deleteFriend($user->id);
+        return $request->user()->follow($user->id);
     }
 
     public function unfollow(User $user, Request $request)
     {
         return $request->user()->unfollow($user->id);
-    }
-
-    public function accept(User $user, Request $request) 
-    {
-        $authUser = $request->user();
-        return $authUser->acceptFriend($user->id);
-    }
-
-    public function deny(User $user, Request $request)
-    {
-        $authUser = $request->user();
-        return $authUser->denyFriend($user->id);
     }
 
     public function paginate($items, $perPage = 5, $page = null, $options = [])
