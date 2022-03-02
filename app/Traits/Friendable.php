@@ -40,7 +40,7 @@ trait Friendable {
             ->where('status', 1)
             ->get();
         foreach ($followers as $follower) {
-            array_push($followerArr, User::find($follower->requester));
+            array_push($followerArr, User::find($follower->requester)->only('id', 'username', 'image_url', 'image_full_url'));
         }
 
         return $followerArr;
@@ -58,7 +58,7 @@ trait Friendable {
             ->where('status', 1)
             ->get();
         foreach ($followingUsers as $following) {
-            array_push($followingArr, User::find($following->user_requested));
+            array_push($followingArr, User::find($following->user_requested)->only('id', 'username', 'image_url', 'image_full_url'));
         }
 
         return $followingArr;
@@ -86,6 +86,7 @@ trait Friendable {
     public function unfollow($user_requested_id)
     {
         $following = Friend::where('user_requested', $user_requested_id)
+            ->where('requester', $this->id)
             ->where('status', 1);
         
             if ($following) {
