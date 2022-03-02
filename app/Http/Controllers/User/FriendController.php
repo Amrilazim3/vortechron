@@ -77,8 +77,7 @@ class FriendController extends Controller
 
     public function follow(User $user, Request $request)
     {
-        return $request->user();
-        // return $request->user()->follow($user->id);
+        return $request->user()->follow($user->id);
     }
 
     public function unfollow(User $user, Request $request)
