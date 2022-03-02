@@ -14,13 +14,29 @@ class FriendController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-
+        
         $friends = $user->friends();
+        $followers = $user->followersIds();
+        $following = $user->followingIds();
         return response()->json([
             'friends'  => $friends,
+            'following' => $following,
+            'followers' => $followers
         ]);
     }
 
+    public function viewOnly(User $user)
+    {
+        $followers = $user->followersIds();
+        $following = $user->followingIds();
+
+        return response()->json([
+            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
+            'followers' => $followers,
+            'following' => $following,
+        ]);
+    }
+    
     public function show(User $user, Request $request)
     {
         $authUser = $request->user();
@@ -39,21 +55,30 @@ class FriendController extends Controller
         ]);
     }
 
-    public function viewOnly(User $user)
+    public function userIndex(User $user, Request $request)
     {
-        $followers = $user->followersIds();
-        $following = $user->followingIds();
+        $authUser = $request->user();
+
+        $friends = $user->friends();
+        $authUserFollowers = $authUser->followersIds();
+        $authUserFollowing = $authUser->followingIds();
+        $userFollowers = $user->followersIds();
+        $userFollowing = $user->followingIds();
 
         return response()->json([
-            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
-            'followers' => $followers,
-            'following' => $following,
+            'friends' => $friends,
+            'auth_user_followers' => $authUserFollowers,
+            'auth_user_following' => $authUserFollowing,
+            'user_followers' => $userFollowers,
+            'user_following' => $userFollowing
         ]);
     }
 
+
     public function follow(User $user, Request $request)
     {
-        return $request->user()->follow($user->id);
+        return $request->user();
+        // return $request->user()->follow($user->id);
     }
 
     public function unfollow(User $user, Request $request)
