@@ -7,11 +7,13 @@ use App\Models\User;
 
 trait Friendable {
 
+    use ArrayPaginable;
+
     public function friends()
     {
         $friends1 = [];
         Friend::where('requester', $this->id)
-            ->chunk(10, function ($friends) use (&$friends1) {
+            ->chunk(20, function ($friends) use (&$friends1) {
                 foreach ($friends as $friend) {
                 array_push($friends1, $friend->user_requested);
             }
@@ -19,27 +21,21 @@ trait Friendable {
 
         $friends2 = [];
         Friend::where('user_requested', $this->id)
-            ->chunk(10, function ($friends) use (&$friends2) {
+            ->chunk(20, function ($friends) use (&$friends2) {
                 foreach ($friends as $friend) {
                 array_push($friends2, $friend->requester);
             }
         });
         
         $realFriends = [];
-        $onlyRealFriends = array_intersect($friends1, $friends2);
+        $results = array_intersect($friends1, $friends2);
 
-        foreach ($onlyRealFriends as $friend) {
-            array_push($realFriends, User::find($friend)->only('id', 'username', 'image_url', 'image_full_url'));
+        foreach ($results as $friend) {
+            array_push($realFriends, User::find($friend)
+                ->only('id', 'username', 'image_url', 'image_full_url'));
         }
 
-        return $realFriends;
-    }
-
-
-
-    public function friendsIds()
-    {
-        return collect($this->friends())->pluck('id')->toArray();
+        return $this->paginate($realFriends, 10);
     }
 
     public function follow($user_requested_id) 
