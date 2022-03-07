@@ -68,4 +68,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return asset('storage/'.$this->image_url);
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(static::class, 'friends', 'user_requested', 'requester')
+            ->where('status', 1);
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(static::class, 'friends', 'requester', 'user_requested')
+            ->where('status', 1);
+    }
 }
