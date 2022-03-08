@@ -43,22 +43,23 @@ Route::middleware('auth')->group(function() {
     Route::get('/user/friends', [FriendController::class, 'index']);
     Route::post('/user/friends/{user}', [FriendController::class, 'follow']);
     Route::delete('/user/friends/unfollow/{user}', [FriendController::class, 'unfollow']);
-    Route::get('/user/followers', [FriendController::class, 'index']);
+    Route::get('/user/followers', [FriendController::class, 'followers']);
     Route::post('/user/followers/{user}', [FriendController::class, 'follow']);
     Route::delete('/user/followers/unfollow/{user}', [FriendController::class, 'unfollow']);
-    Route::get('/user/following', [FriendController::class, 'index']);
+    Route::get('/user/following', [FriendController::class, 'following']);
     Route::post('/user/following/{user}', [FriendController::class, 'follow']);
     Route::delete('/user/following/unfollow/{user}', [FriendController::class, 'unfollow']);
 
     Route::get('/users/{user}', [FriendController::class, 'show']);
     Route::post('/users/{user}', [FriendController::class, 'follow']);
     Route::delete('/users/unfollow/{user}', [FriendController::class, 'unfollow']);
-    Route::get('/users/followers/{user}', [FriendController::class, 'userIndex']);
-    Route::get('/users/following/{user}', [FriendController::class, 'userIndex']);
+    Route::get('/users/followers/{user}', [FriendController::class, 'showFollowers']);
+    Route::get('/users/following/{user}', [FriendController::class, 'showFollowing']);
 });
 
 // route for getting users and posts 
 Route::get('/users', [SearchController::class, 'index']);
+// show user profile while unauthenticated
 Route::get('/users/view-only/{user}', [FriendController::class, 'viewOnly']);
 
 // This route can be access by non-authenticated & authenticated users (as long user have password)
