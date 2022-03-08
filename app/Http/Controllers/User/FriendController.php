@@ -2,78 +2,176 @@
 
 namespace App\Http\Controllers\User;
 
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\Friend;
 use App\Models\User;
+use App\Traits\ArrayPaginable;
 use Illuminate\Http\Request;
 
 class FriendController extends Controller
 {
+    use ArrayPaginable;
+
     public function index(Request $request)
     {
         $user = $request->user();
-        
         $friends = $user->friends();
-        $followers = $user->followersIds();
-        $following = $user->followingIds();
+
         return response()->json([
-            'friends'  => $friends,
+            'friends' => $friends
+        ]);
+    }
+
+    public function followers(Request $request)
+    {
+        $authUser = $request->user();
+        $resFollowers = $this->paginate(
+            $authUser->followers,
+            10
+        );
+        $followers = UserResource::collection($resFollowers)
+            ->response()
+            ->getData(true);
+            
+        $followingIds = $this->paginate(
+            $authUser->following->sort()->pluck('id'),
+            10
+        );
+
+        return response()->json([
+            'followers' => $followers,
+            'following_ids' => $followingIds
+        ]);
+    }
+
+    public function following(Request $request)
+    {
+        $authUser = $request->user();
+        $resFollowing = $this->paginate(
+            $authUser->following,
+            10
+        );
+        $following = UserResource::collection($resFollowing)
+            ->response()
+            ->getData();
+
+        $followingsIds = $this->paginate(
+            $authUser->following->pluck('id'),
+            10
+        );
+
+        return response()->json([
             'following' => $following,
-            'followers' => $followers
+            'following_ids' => $followingsIds
+        ]);
+    }
+
+    public function show(User $user, Request $request)
+    {
+        $authUser = $request->user();
+
+        $followersCount = $user::withCount('followers')
+            ->find($user->id)
+            ->followers_count;
+        $followingCount = $user::withCount('following')
+            ->find($user->id)
+            ->following_count;
+
+        $isFriendWithUser = Friend::where('requester', $authUser->id)
+                                ->where('user_requested', $user->id)
+                                ->where('status', 1)
+                                ->exists();
+
+        $userIsFriendWithAuthUser = Friend::where('user_requested', $authUser->id)
+                                        ->where('requester', $user->id)
+                                        ->where('status', 1)
+                                        ->exists();
+
+        return response()->json([
+            'user' => $user->only(
+                    'id',
+                    'name',
+                    'username',
+                    'image_url',
+                    'image_full_url',
+                    'bio'
+            ),
+            'followers_count' => $followersCount,
+            'following_count' => $followingCount,
+            'is_friend_with_user' => $isFriendWithUser,
+            'user_friend_with_auth_user' => $userIsFriendWithAuthUser,
         ]);
     }
 
     public function viewOnly(User $user)
     {
-        $followers = $user->followersIds();
-        $following = $user->followingIds();
+        $followersCount = $user::withCount('followers')
+            ->find($user->id)
+            ->followers_count;
+        $followingCount = $user::withCount('following')
+            ->find($user->id)
+            ->following_count;
 
         return response()->json([
-            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
-            'followers' => $followers,
-            'following' => $following,
+            'user' => $user->only(
+                    'id',
+                    'name',
+                    'username',
+                    'image_url',
+                    'image_full_url',
+                    'bio'
+            ),
+            'followers_count' => $followersCount,
+            'following_count' => $followingCount,
         ]);
     }
-    
-    public function show(User $user, Request $request)
+
+    public function showFollowers(User $user, Request $request)
     {
         $authUser = $request->user();
 
-        $followers = $user->followersIds();
-        $following = $user->followingIds();
-        $isFriendWith = $authUser->isFriendsWith($user->id);
-        $userIsFriendWithAuthUser = $user->isFriendsWith($authUser->id);
+        $resFollowers = $this->paginate(
+            $user->followers->sort(),
+            10
+        );
+        $followers = UserResource::collection($resFollowers)
+            ->response()
+            ->getData(true);
+            
+        $followingIds = $this->paginate(
+            $authUser->following->sort()->pluck('id'),
+            10
+        );
 
         return response()->json([
-            'user' => $user->only('id', 'name', 'username', 'image_url', 'image_full_url', 'bio'),
             'followers' => $followers,
-            'following' => $following,
-            'is_friend_with' => $isFriendWith,
-            'user_friend_with_auth_user' => $userIsFriendWithAuthUser,
+            'following_ids' => $followingIds
         ]);
     }
 
-    public function userIndex(User $user, Request $request)
+    public function showFollowing(User $user, Request $request)
     {
         $authUser = $request->user();
 
-        $friends = $user->friends();
-        $authUserFollowers = $authUser->followersIds();
-        $authUserFollowing = $authUser->followingIds();
-        $userFollowers = $user->followersIds();
-        $userFollowing = $user->followingIds();
+        $resFollowing = $this->paginate(
+            $user->following->sort(),
+            10
+        );
+        $following = UserResource::collection($resFollowing)
+            ->response()
+            ->getData();
+
+        $followingsIds = $this->paginate(
+            $authUser->following->sort()->pluck('id'),
+            10
+        );
 
         return response()->json([
-            'friends' => $friends,
-            'auth_user_followers' => $authUserFollowers,
-            'auth_user_following' => $authUserFollowing,
-            'user_followers' => $userFollowers,
-            'user_following' => $userFollowing
+            'following' => $following,
+            'following_ids' => $followingsIds
         ]);
     }
-
 
     public function follow(User $user, Request $request)
     {
@@ -83,12 +181,5 @@ class FriendController extends Controller
     public function unfollow(User $user, Request $request)
     {
         return $request->user()->unfollow($user->id);
-    }
-
-    public function paginate($items, $perPage = 5, $page = null, $options = [])
-    {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
-        $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }
