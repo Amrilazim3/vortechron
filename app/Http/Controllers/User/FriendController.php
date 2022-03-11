@@ -137,14 +137,26 @@ class FriendController extends Controller
         );
         $followers = UserResource::collection($resFollowers)
             ->response()
-            ->getData(true);
+            ->getData();
             
-        $followingIds = $this->paginate(
-            $authUser->following->sort()->pluck('id'),
-            10
-        );
+        $followingIds = [];
+
+        foreach ($followers as $eachFollower) {
+            foreach ($eachFollower as $singleUser) {
+                if (is_object($singleUser)) {
+                    $isFollowing = Friend::where('user_requested', $singleUser->id)
+                        ->where('requester', $authUser['id'])
+                        ->exists();
+                        
+                    if ($isFollowing) {
+                        array_push($followingIds, $singleUser->id);
+                    }
+                }
+            }
+        }
 
         return response()->json([
+            'username' => $user->username,
             'followers' => $followers,
             'following_ids' => $followingIds
         ]);
@@ -162,12 +174,24 @@ class FriendController extends Controller
             ->response()
             ->getData();
 
-        $followingsIds = $this->paginate(
-            $authUser->following->sort()->pluck('id'),
-            10
-        );
+        $followingsIds = [];
+
+        foreach ($following as $eachFollowing) {
+            foreach ($eachFollowing as $singleUser) {
+                if (is_object($singleUser)) {
+                    $isFollowing = Friend::where('user_requested', $singleUser->id)
+                        ->where('requester', $authUser['id'])
+                        ->exists();
+                        
+                    if ($isFollowing) {
+                        array_push($followingsIds, $singleUser->id);
+                    }
+                }
+            }
+        }
 
         return response()->json([
+            'username' => $user->username,
             'following' => $following,
             'following_ids' => $followingsIds
         ]);
