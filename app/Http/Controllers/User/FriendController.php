@@ -132,7 +132,7 @@ class FriendController extends Controller
         $authUser = $request->user();
 
         $resFollowers = $this->paginate(
-            $user->followers->sort(),
+            $user->followers,
             10
         );
         $followers = UserResource::collection($resFollowers)
@@ -167,7 +167,7 @@ class FriendController extends Controller
         $authUser = $request->user();
 
         $resFollowing = $this->paginate(
-            $user->following->sort(),
+            $user->following,
             10
         );
         $following = UserResource::collection($resFollowing)
