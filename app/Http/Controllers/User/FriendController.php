@@ -28,7 +28,7 @@ class FriendController extends Controller
         $authUser = $request->user();
         $resFollowers = $this->paginate(
             $authUser->followers,
-            10
+            20
         );
         $followers = UserResource::collection($resFollowers)
             ->response()
@@ -36,7 +36,7 @@ class FriendController extends Controller
             
         $followingIds = $this->paginate(
             $authUser->following->sort()->pluck('id'),
-            10
+            20
         );
 
         return response()->json([
@@ -50,7 +50,7 @@ class FriendController extends Controller
         $authUser = $request->user();
         $resFollowing = $this->paginate(
             $authUser->following,
-            10
+            20
         );
         $following = UserResource::collection($resFollowing)
             ->response()
@@ -58,7 +58,7 @@ class FriendController extends Controller
 
         $followingsIds = $this->paginate(
             $authUser->following->pluck('id'),
-            10
+            20
         );
 
         return response()->json([
@@ -133,7 +133,7 @@ class FriendController extends Controller
 
         $resFollowers = $this->paginate(
             $user->followers,
-            10
+            20
         );
         $followers = UserResource::collection($resFollowers)
             ->response()
@@ -168,7 +168,7 @@ class FriendController extends Controller
 
         $resFollowing = $this->paginate(
             $user->following,
-            10
+            20
         );
         $following = UserResource::collection($resFollowing)
             ->response()
