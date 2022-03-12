@@ -35,7 +35,7 @@ trait Friendable {
                 ->only('id', 'username', 'image_url', 'image_full_url'));
         }
 
-        return $this->paginate($realFriends, 10);
+        return $this->paginate($realFriends, 20);
     }
 
     public function follow($user_requested_id) 
