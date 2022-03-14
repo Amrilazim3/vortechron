@@ -80,4 +80,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return $this->belongsToMany(static::class, 'friends', 'requester', 'user_requested')
             ->where('status', 1);
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
