@@ -32,7 +32,7 @@ class FriendController extends Controller
         );
         $followers = UserResource::collection($resFollowers)
             ->response()
-            ->getData(true);
+            ->getData();
             
         $followingIds = $this->paginate(
             $authUser->following->sort()->pluck('id'),
