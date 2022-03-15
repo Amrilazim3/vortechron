@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Category;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserPostResource extends JsonResource
@@ -15,7 +16,8 @@ class UserPostResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'category_id' => $this->category_id,
+            'category' => Category::where('id', $this->category_id)->pluck('name'),
+            'category_slug' => Category::where('id', $this->category_id)->pluck('slug'),
             'title' => $this->title,
             'slug' => $this->slug,
             'thumbnail' => $this->thumbnail,
