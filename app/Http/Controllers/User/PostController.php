@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Traits\ArrayPaginable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -38,12 +39,6 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -60,7 +55,7 @@ class PostController extends Controller
                 $this->findCategoryId($request->category) : 
                 null,
             'title' => $request->title,
-            'slug' => Str::slug($request->title) . '-' . Str::random(10) ,
+            'slug' => Str::slug($request->title) . '-' . Str::random(10),
             'thumbnail' => $request->hasFile('thumbnail') ? 
                 $this->insertThumbnail($request) :
                 null,
@@ -73,12 +68,6 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function show(Post $post)
     {
         return response()->json([
@@ -86,37 +75,55 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Post $post)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:50',
+            'thumbnail' => 'nullable|image|file',
+            'excerpt' => 'required|max:100',
+            'body' => 'required|min:100',
+            'category' => 'nullable'
+        ]);
+
+        $post->update([
+            'category_id' => $request->category ? 
+                $this->findCategoryId($request->category) : 
+                null,
+            'title' => $request->title,
+            'slug' => Str::slug($request->title) . '-' . Str::random(10),
+            'thumbnail' => $request->hasFile('thumbnail') ? 
+                $this->updateThumbnail($request, $post->thumbnail) :
+                $post->thumbnail,
+            'excerpt' => $request->excerpt,
+            'body' => '<p>' . $request->body . '</p>'
+        ]);
+
+        return response()->json([
+            'success' => 'posts has been updated'
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Post $post)
     {
-        //
+        if ($post->thumbnail) {
+            $appPath = asset('/storage/');
+            $thumbnailPath = str_replace($appPath . '/', "", $post->thumbnail);
+            Storage::disk('public')->delete($thumbnailPath);
+        }
+
+        Post::find($post->id)->delete();
+
+        return true;
     }
 
     // addtional function
-    public function insertThumbnail($request)
+    protected function insertThumbnail($request)
     {
         $thumbnail = $request->file('thumbnail')->store('posts', 'public');
         return asset('storage/' . $thumbnail);
     }
 
-    public function findCategoryId($category) 
+    protected function findCategoryId($category) 
     {
         $category = Category::where('name', $category)->first();
 
@@ -125,5 +132,15 @@ class PostController extends Controller
         } else {
             return false;
         }
+    }
+
+    protected function updateThumbnail($request, $recentThumbnail)
+    {
+        $appPath = asset('/storage/');
+        $thumbnailPath = str_replace($appPath . '/', "", $recentThumbnail);
+        Storage::disk('public')->delete($thumbnailPath);
+
+        $newThumbnail = $request->file('thumbnail')->store('posts', 'public');
+        return asset('storage/' . $newThumbnail);
     }
 }
