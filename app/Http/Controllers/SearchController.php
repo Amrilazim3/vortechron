@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    public function index()
+    public function searchUsers()
     {
         $users = User::search(request(['search']))
         ->select('id', 'username', 'image_url')
