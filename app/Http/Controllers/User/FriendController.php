@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserPostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Friend;
 use App\Models\User;
@@ -74,6 +75,7 @@ class FriendController extends Controller
         $followersCount = $user::withCount('followers')
             ->find($user->id)
             ->followers_count;
+
         $followingCount = $user::withCount('following')
             ->find($user->id)
             ->following_count;
@@ -88,6 +90,19 @@ class FriendController extends Controller
                                         ->where('status', 1)
                                         ->exists();
 
+        $postsCount = $user::withCount('posts')
+            ->find($user->id)
+            ->posts_count;
+
+        $resPosts =  $this->paginate(
+            $user->posts,
+            12
+        );
+
+        $posts = UserPostResource::collection($resPosts)
+            ->response()
+            ->getData();
+
         return response()->json([
             'user' => $user->only(
                     'id',
@@ -101,6 +116,8 @@ class FriendController extends Controller
             'following_count' => $followingCount,
             'is_friend_with_user' => $isFriendWithUser,
             'user_friend_with_auth_user' => $userIsFriendWithAuthUser,
+            'posts_count' => $postsCount,
+            'posts' => $posts
         ]);
     }
 
@@ -113,6 +130,19 @@ class FriendController extends Controller
             ->find($user->id)
             ->following_count;
 
+        $postsCount = $user::withCount('posts')
+            ->find($user->id)
+            ->posts_count;
+
+        $resPosts =  $this->paginate(
+            $user->posts,
+            12
+        );
+
+        $posts = UserPostResource::collection($resPosts)
+            ->response()
+            ->getData();
+
         return response()->json([
             'user' => $user->only(
                     'id',
@@ -124,6 +154,8 @@ class FriendController extends Controller
             ),
             'followers_count' => $followersCount,
             'following_count' => $followingCount,
+            'posts_count' => $postsCount,
+            'posts' => $posts
         ]);
     }
 
