@@ -11,7 +11,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $resPosts = Post::paginate(20);
+        $resPosts = Post::inRandomOrder()->paginate(20);
         $posts = AllPostResource::collection($resPosts)
                     ->response()
                     ->getData();
@@ -26,6 +26,18 @@ class PostController extends Controller
     {
         return response()->json([
             'post' => new ShowPostResource($post)
+        ]);
+    }
+
+    public function latest()
+    {
+        $resPosts = Post::orderBy('created_at', 'desc')->paginate(20);
+        $posts = AllPostResource::collection($resPosts)
+                    ->response()
+                    ->getData();
+
+        return response()->json([
+            'posts' => $posts
         ]);
     }
 }
