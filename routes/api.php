@@ -6,15 +6,20 @@ use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Post\CategoryController;
+use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\User\Account\EditProfileController;
 use App\Http\Controllers\User\Account\ProfileController;
 use App\Http\Controllers\User\ChangePasswordController;
 use App\Http\Controllers\User\ForgotPasswordController;
 use App\Http\Controllers\User\FriendController;
+use App\Http\Controllers\User\PostController as UserPostController;
 use App\Http\Controllers\User\ResetPasswordController;
 use App\Http\Controllers\User\SetPasswordController;
-use App\Models\Friend;
+use App\Http\Resources\EditPostResource;
+use App\Models\Category;
+use App\Models\Post;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -55,12 +60,40 @@ Route::middleware('auth')->group(function() {
     Route::delete('/users/unfollow/{user}', [FriendController::class, 'unfollow']);
     Route::get('/users/followers/{user}', [FriendController::class, 'showFollowers']);
     Route::get('/users/following/{user}', [FriendController::class, 'showFollowing']);
+
+    Route::get('/user/posts', [UserPostController::class, 'index']);
+    Route::get('/user/posts/{post:slug}', [UserPostController::class, 'show']);
+    Route::get('/user/posts/create/categories-list', function () {
+        $categories = Category::orderBy('name')->get(['name']);
+        return response()->json([
+            'categories' => $categories
+        ]); 
+    });
+    Route::post('/user/posts/create', [UserPostController::class, 'store']);
+    Route::get('/user/posts/edit-post-data/{post:slug}', function (Post $post) {
+        return response()->json([
+            'post' => new EditPostResource($post)
+        ]);
+    });
+    // cannot use patch method cause $axios.patch cannot send multipart data
+    Route::post('/user/posts/{post:slug}/edit', [UserPostController::class, 'update']);
+    Route::delete('/user/posts/{post:slug}/delete', [UserPostController::class, 'destroy']);
 });
 
-// route for getting users and posts 
-Route::get('/users', [SearchController::class, 'index']);
+// route for searching users or posts
+Route::get('/users-or-posts', [SearchController::class, '__invoke']);
 // show user profile while unauthenticated
 Route::get('/users/view-only/{user}', [FriendController::class, 'viewOnly']);
+// show all post in dashboard randomly
+Route::get('/posts', [PostController::class, 'index']);
+// show all posts sort by 'created_at'
+Route::get('/posts/latest', [PostController::class, 'latest']);
+// get user single's post
+Route::get('/users/posts/{post:slug}', [PostController::class, 'show']);
+// get all post categories 
+Route::get('/posts/categories', [CategoryController::class, 'index']);
+// get all posts by the selected category
+Route::get('/posts/categories/{category:slug}', [CategoryController::class, 'show']);
 
 // This route can be access by non-authenticated & authenticated users (as long user have password)
 Route::post('/user/account/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
