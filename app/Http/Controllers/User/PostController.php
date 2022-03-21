@@ -79,7 +79,10 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required|max:50',
-            'thumbnail' => 'nullable|image|file',
+            'thumbnail' => [
+                'nullable',
+                is_string($request->thumbnail) ? '' : ['image', 'file']
+            ],
             'excerpt' => 'required|max:100',
             'body' => 'required|min:100',
             'category' => 'nullable'
@@ -92,8 +95,8 @@ class PostController extends Controller
             'title' => $request->title,
             'slug' => Str::slug($request->title) . '-' . Str::random(10),
             'thumbnail' => $request->hasFile('thumbnail') ? 
-                $this->updateThumbnail($request, $post->thumbnail) :
-                $post->thumbnail,
+                $this->updateThumbnail($request, $post->thumbnail) : 
+                ($request->thumbnail == '' ? $this->clearThumbnail($post->thumbnail) : $post->thumbnail),
             'excerpt' => $request->excerpt,
             'body' => '<p>' . $request->body . '</p>'
         ]);
@@ -106,9 +109,7 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         if ($post->thumbnail) {
-            $appPath = asset('/storage/');
-            $thumbnailPath = str_replace($appPath . '/', "", $post->thumbnail);
-            Storage::disk('public')->delete($thumbnailPath);
+            $this->removeRecentThumbnail($post->thumbnail);
         }
 
         Post::find($post->id)->delete();
@@ -116,7 +117,7 @@ class PostController extends Controller
         return true;
     }
 
-    // addtional function
+    // addtional functions
     protected function insertThumbnail($request)
     {
         $thumbnail = $request->file('thumbnail')->store('posts', 'public');
@@ -136,11 +137,22 @@ class PostController extends Controller
 
     protected function updateThumbnail($request, $recentThumbnail)
     {
-        $appPath = asset('/storage/');
-        $thumbnailPath = str_replace($appPath . '/', "", $recentThumbnail);
-        Storage::disk('public')->delete($thumbnailPath);
+        $this->removeRecentThumbnail($recentThumbnail);
 
         $newThumbnail = $request->file('thumbnail')->store('posts', 'public');
         return asset('storage/' . $newThumbnail);
+    }
+
+    protected function clearThumbnail($recentThumbnail)
+    {
+        $this->removeRecentThumbnail($recentThumbnail);
+        return null;
+    }
+
+    protected function removeRecentThumbnail($recentThumbnail)
+    {
+        $appPath = asset('/storage/');
+        $thumbnailPath = str_replace($appPath . '/', "", $recentThumbnail);
+        Storage::disk('public')->delete($thumbnailPath);
     }
 }
