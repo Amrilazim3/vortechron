@@ -95,7 +95,7 @@ class FriendController extends Controller
             ->posts_count;
 
         $resPosts =  $this->paginate(
-            $user->posts,
+            $user->posts->sortByDesc('created_at'),
             12
         );
 
@@ -135,7 +135,7 @@ class FriendController extends Controller
             ->posts_count;
 
         $resPosts =  $this->paginate(
-            $user->posts,
+            $user->posts->sortByDesc('created_at'),
             12
         );
 
