@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Post\CategoryController;
+use App\Http\Controllers\Post\CommentController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\User\Account\EditProfileController;
@@ -78,6 +79,7 @@ Route::middleware('auth')->group(function() {
     // cannot use patch method cause $axios.patch cannot send multipart data
     Route::post('/user/posts/{post:slug}/edit', [UserPostController::class, 'update']);
     Route::delete('/user/posts/{post:slug}/delete', [UserPostController::class, 'destroy']);
+    Route::post('/comment/post', [CommentController::class, 'store']);
 });
 
 // route for searching users or posts
@@ -94,6 +96,8 @@ Route::get('/users/posts/{post:slug}', [PostController::class, 'show']);
 Route::get('/posts/categories', [CategoryController::class, 'index']);
 // get all posts by the selected category
 Route::get('/posts/categories/{category:slug}', [CategoryController::class, 'show']);
+// get all comments by when view single post
+Route::get('/comments/{post:slug}', [CommentController::class, 'index']);
 
 // This route can be access by non-authenticated & authenticated users (as long user have password)
 Route::post('/user/account/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
