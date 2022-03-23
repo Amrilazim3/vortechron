@@ -20,6 +20,7 @@ class ShowPostResource extends JsonResource
             'username' => User::where('id', $this->user_id)->pluck('username'),
             'image_url' => User::where('id', $this->user_id)->pluck('image_url'),
             'image_full_url' => asset('storage/' . User::where('id', $this->user_id)->pluck('image_url')[0]),
+            'post_id' => $this->id,
             'title' => $this->title,
             'category' => Category::where('id', $this->category_id)->pluck('name'),
             'category_slug' => Category::where('id', $this->category_id)->pluck('slug'),
