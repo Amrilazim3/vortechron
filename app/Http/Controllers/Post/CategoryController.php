@@ -20,7 +20,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $resPosts = Post::where('category_id', $category->id)->paginate(20);
+        $resPosts = Post::where('category_id', $category->id)->orderByDesc('created_at')->paginate(20);
         $posts = AllPostResource::collection($resPosts)
                     ->response()
                     ->getData();
