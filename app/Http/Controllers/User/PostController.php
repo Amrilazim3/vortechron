@@ -44,8 +44,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|max:50',
             'thumbnail' => 'nullable|image|file',
-            'excerpt' => 'required|max:100',
-            'body' => 'required|min:100',
+            'excerpt' => 'required|max:150',
+            'body' => 'required|min:300',
             'category' => 'nullable'
         ]);
 
@@ -83,8 +83,8 @@ class PostController extends Controller
                 'nullable',
                 is_string($request->thumbnail) ? '' : ['image', 'file']
             ],
-            'excerpt' => 'required|max:100',
-            'body' => 'required|min:100',
+            'excerpt' => 'required|max:150',
+            'body' => 'required|min:300',
             'category' => 'nullable'
         ]);
 
