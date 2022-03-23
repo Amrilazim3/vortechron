@@ -14,13 +14,17 @@ class PostFactory extends Factory
      */
     public function definition()
     {
+        $userId = [41,45,72,73,76,77];
+        $k = array_rand($userId);
+
         return [
-            'user_id' => User::factory(),
+            'user_id' => $userId[$k],
+            'category_id' => rand(1, 43),
             'slug' => $this->faker->unique()->slug(),
-            'title' => $this->faker->sentence(),
-            'thumbnail' => $this->faker->imageUrl(),
-            'excerpt' => '<p>' . implode('</p></p>', $this->faker->paragraphs(2)) . '</p>',
-            'body' => '<p>' . implode('</p></p>', $this->faker->paragraphs(6)) . '</p>',
+            'title' => $this->faker->sentence(2),
+            'thumbnail' => null,
+            'excerpt' => $this->faker->sentence(12),
+            'body' => '<p>' . implode('</p></p>', $this->faker->paragraphs(12)) . '</p>',
         ];
     }
 }
