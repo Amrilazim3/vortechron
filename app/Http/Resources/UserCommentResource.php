@@ -20,6 +20,7 @@ class UserCommentResource extends JsonResource
             'image_url' => User::where('id', $this->user_id)->pluck('image_url')[0],
             'image_full_url' => asset('storage/' . User::where('id', $this->user_id)->pluck('image_url')[0]),
             'user_id' => $this->user_id,
+            'id' => $this->id,
             'body' => $this->body,
             'created_at' => $this->created_at
         ];
