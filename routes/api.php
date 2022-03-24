@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/user/posts/{post:slug}/edit', [UserPostController::class, 'update']);
     Route::delete('/user/posts/{post:slug}/delete', [UserPostController::class, 'destroy']);
     Route::post('/comment/post', [CommentController::class, 'store']);
+    Route::delete('/comment/delete/{comment}', [CommentController::class, 'destroy']);
 });
 
 // route for searching users or posts
