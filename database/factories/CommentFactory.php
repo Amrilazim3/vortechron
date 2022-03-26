@@ -15,10 +15,13 @@ class CommentFactory extends Factory
      */
     public function definition()
     {
+        $userId = [41,45,72,73,76,77];
+        $k = array_rand($userId);
+
         return [
-            'post_id' => Post::factory(),
-            'user_id' => User::factory(),
-            'body' => $this->faker->paragraph()
+            'post_id' => 180,
+            'user_id' => $userId[$k],
+            'body' => $this->faker->sentence(2)
         ];
     }
 }
