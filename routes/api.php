@@ -10,6 +10,7 @@ use App\Http\Controllers\Post\BookmarkController;
 use App\Http\Controllers\Post\CategoryController;
 use App\Http\Controllers\Post\CommentController;
 use App\Http\Controllers\Post\LikeController;
+use App\Http\Controllers\Post\PopularController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\User\Account\EditProfileController;
@@ -84,8 +85,8 @@ Route::middleware('auth')->group(function() {
     Route::post('/user/posts/{post:slug}/edit', [UserPostController::class, 'update']);
     Route::delete('/user/posts/{post:slug}/delete', [UserPostController::class, 'destroy']);
 
-    Route::get('/user/posts/liked', [LikeController::class, 'index']);
-    Route::get('/user/posts/bookmarked', [BookmarkController::class, 'index']);
+    Route::get('/user/liked/posts', [LikeController::class, 'index']);
+    Route::get('/user/bookmarked/posts', [BookmarkController::class, 'index']);
 
     Route::post('/comment/post', [CommentController::class, 'store']);
     Route::delete('/comment/delete/{comment}', [CommentController::class, 'destroy']);
@@ -121,8 +122,11 @@ Route::get('/users/view-only/{user}', [FriendController::class, 'viewOnly']);
 // show all post in dashboard randomly
 Route::get('/posts', [PostController::class, 'index']);
 
-// show all posts sort by 'created_at'
+// show all posts sort by 'created_at' (latest)
 Route::get('/posts/latest', [PostController::class, 'latest']);
+
+// show all popular posts (by liked post)
+Route::get('/posts/popular', [PopularController::class, '__invoke']);
 
 // get user single's post
 Route::get('/users/posts/{post:slug}', [PostController::class, 'show']);
