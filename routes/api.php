@@ -6,8 +6,10 @@ use App\Http\Controllers\Auth\SignInController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Post\BookmarkController;
 use App\Http\Controllers\Post\CategoryController;
 use App\Http\Controllers\Post\CommentController;
+use App\Http\Controllers\Post\LikeController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\User\Account\EditProfileController;
@@ -19,8 +21,11 @@ use App\Http\Controllers\User\PostController as UserPostController;
 use App\Http\Controllers\User\ResetPasswordController;
 use App\Http\Controllers\User\SetPasswordController;
 use App\Http\Resources\EditPostResource;
+use App\Models\Bookmark;
 use App\Models\Category;
+use App\Models\Like;
 use App\Models\Post;
+use App\Models\User;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -76,11 +81,35 @@ Route::middleware('auth')->group(function() {
             'post' => new EditPostResource($post)
         ]);
     });
-    // cannot use patch method cause $axios.patch cannot send multipart data
     Route::post('/user/posts/{post:slug}/edit', [UserPostController::class, 'update']);
     Route::delete('/user/posts/{post:slug}/delete', [UserPostController::class, 'destroy']);
+
+    Route::get('/user/posts/liked', [LikeController::class, 'index']);
+    Route::get('/user/posts/bookmarked', [BookmarkController::class, 'index']);
+
     Route::post('/comment/post', [CommentController::class, 'store']);
     Route::delete('/comment/delete/{comment}', [CommentController::class, 'destroy']);
+
+    Route::get('/posts/{post:slug}/{user}/get-like-and-bookmark-condition', function (Post $post, User $user) {
+        $LikedPost = Like::where('user_id', $user->id)
+            ->where('post_id', $post->id)
+            ->exists();
+
+        $bookmarkedPost = Bookmark::where('user_id', $user->id)
+            ->where('post_id', $post->id)
+            ->exists();
+
+        return response()->json([
+            'is_liked' => $LikedPost,
+            'is_bookmarked' => $bookmarkedPost,
+        ]);
+    });
+    Route::post('/posts/{post:slug}/like', [LikeController::class, 'store']);
+    Route::delete('/posts/{post:slug}/{user}/like/delete', [LikeController::class, 'destroy']);
+
+    Route::post('/posts/{post:slug}/bookmark', [BookmarkController::class, 'store']);
+    Route::delete('/posts/{post:slug}/{user}/bookmark/delete', [BookmarkController::class, 'destroy']);
+
 });
 
 // route for searching users or posts
@@ -105,7 +134,7 @@ Route::get('/posts/categories', [CategoryController::class, 'index']);
 Route::get('/posts/categories/{category:slug}', [CategoryController::class, 'show']);
 
 // get all comments by when view single post
-Route::get('/comments/{post:slug}', [CommentController::class, 'index']);
+Route::get('/{post:slug}/comments', [CommentController::class, 'index']);
 
 // This route can be access by non-authenticated & authenticated users (as long user have password)
 Route::post('/user/account/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
