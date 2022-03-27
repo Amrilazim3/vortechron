@@ -85,34 +85,44 @@ Route::middleware('auth')->group(function() {
 
 // route for searching users or posts
 Route::get('/users-or-posts', [SearchController::class, '__invoke']);
+
 // show user profile while unauthenticated
 Route::get('/users/view-only/{user}', [FriendController::class, 'viewOnly']);
+
 // show all post in dashboard randomly
 Route::get('/posts', [PostController::class, 'index']);
+
 // show all posts sort by 'created_at'
 Route::get('/posts/latest', [PostController::class, 'latest']);
+
 // get user single's post
 Route::get('/users/posts/{post:slug}', [PostController::class, 'show']);
+
 // get all post categories 
 Route::get('/posts/categories', [CategoryController::class, 'index']);
+
 // get all posts by the selected category
 Route::get('/posts/categories/{category:slug}', [CategoryController::class, 'show']);
+
 // get all comments by when view single post
 Route::get('/comments/{post:slug}', [CommentController::class, 'index']);
 
 // This route can be access by non-authenticated & authenticated users (as long user have password)
 Route::post('/user/account/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
     ->name('password.email');
-// when user click link in the email
+
+// when user click the link that has been emailed to them
 Route::get('/user/account/forgot-password/{token}', [ForgotPasswordController::class, 'handle'])
     ->name('password.reset');
-//handle reset password form 
+
+// handle reset password form 
 Route::patch('/user/account/reset-password', [ResetPasswordController::class, 'resetPassword']);
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
+    
 // Resend link to verify email
 Route::post('/email/verify/resend', [VerifyEmailController::class, 'resend'])
     ->middleware(['auth:sanctum', 'throttle:6,1'])
