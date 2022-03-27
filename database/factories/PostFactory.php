@@ -14,12 +14,12 @@ class PostFactory extends Factory
      */
     public function definition()
     {
-        $userId = [41,45,72,73,76,77];
+        $userId = [45,72,73,76,77,100,114,125,126,127];
         $k = array_rand($userId);
 
         return [
             'user_id' => $userId[$k],
-            'category_id' => rand(1, 43),
+            'category_id' => rand(1, 46),
             'slug' => $this->faker->unique()->slug(),
             'title' => $this->faker->sentence(2),
             'thumbnail' => null,
