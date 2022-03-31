@@ -23,7 +23,8 @@ class UserPostResource extends JsonResource
             'thumbnail' => $this->thumbnail,
             'excerpt' => $this->excerpt,
             'body' => $this->body,
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'likes_count' => $this->likes->count()
         ];
     }
 }
