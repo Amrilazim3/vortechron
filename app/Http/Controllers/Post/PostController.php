@@ -40,4 +40,19 @@ class PostController extends Controller
             'posts' => $posts
         ]);
     }
+
+    public function popular()
+    {
+        $posts = Post::withCount('likes')
+        ->orderBy('likes_count', 'desc')
+        ->paginate(21);
+
+        $posts = AllPostResource::collection($posts)
+            ->response()
+            ->getData();
+
+        return response()->json([
+            'posts' => $posts
+        ]);
+    }
 }
