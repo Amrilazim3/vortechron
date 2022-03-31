@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,7 +29,8 @@ class AllPostResource extends JsonResource
             'category' => Category::where('id', $this->category_id)->pluck('name'),
             'category_slug' => Category::where('id', $this->category_id)->pluck('slug'),
             'created_at' => $this->created_at,
-            'body' => $this->body
+            'body' => $this->body,
+            'likes_count' => $this->likes->count()
         ];
     }
 }
