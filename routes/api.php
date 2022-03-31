@@ -126,7 +126,7 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/latest', [PostController::class, 'latest']);
 
 // show all popular posts (by liked post)
-Route::get('/posts/popular', [PopularController::class, '__invoke']);
+Route::get('/posts/popular', [PostController::class, 'popular']);
 
 // get user single's post
 Route::get('/users/posts/{post:slug}', [PostController::class, 'show']);
